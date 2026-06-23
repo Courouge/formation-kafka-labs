@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "namespace": "fr.formation.kafka.ecommerce",
+  "name": "StockOutOfStock",
+  "doc": "Émis par StockService quand le stock est insuffisant. Déclenche compensation.",
+  "fields": [
+    {"name": "event_id", "type": "string"},
+    {"name": "order_id", "type": "string"},
+    {"name": "occurred_at", "type": {"type": "long", "logicalType": "timestamp-millis"}},
+    {"name": "version", "type": "int"},
+    {"name": "missing_sku", "type": "string"}
+  ]
+}

@@ -1,0 +1,151 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "liveNow": false,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Brokers up",
+      "id": 1,
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "count(up{job=\"kafka-brokers\"} == 1)",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "colorMode": "value",
+        "graphMode": "area",
+        "textMode": "auto"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Topics",
+      "id": 2,
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "count(count by (topic) (kafka_server_brokertopicmetrics_messagesinpersec_total))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Partitions totales",
+      "id": 3,
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum(kafka_server_replicamanager_partitioncount)",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Under-replicated partitions",
+      "id": 4,
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum(kafka_server_replicamanager_underreplicatedpartitions)",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Messages in / sec par broker",
+      "id": 5,
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum by (instance) (rate(kafka_server_brokertopicmetrics_messagesinpersec_total[1m]))",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Bytes in / sec",
+      "id": 6,
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum by (instance) (rate(kafka_server_brokertopicmetrics_bytesinpersec_total[1m]))",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "CPU JVM (process_cpu_seconds_total)",
+      "id": 7,
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 13 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "rate(process_cpu_seconds_total{job=\"kafka-brokers\"}[1m])",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "ISR shrinks / expands",
+      "id": 8,
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 13 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "rate(kafka_server_replicamanager_isrshrinkspersec_total[5m])",
+          "legendFormat": "shrinks {{instance}}",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(kafka_server_replicamanager_isrexpandspersec_total[5m])",
+          "legendFormat": "expands {{instance}}",
+          "refId": "B"
+        }
+      ]
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": ["kafka", "formation"],
+  "templating": { "list": [] },
+  "time": { "from": "now-30m", "to": "now" },
+  "timezone": "",
+  "title": "Kafka Cluster",
+  "uid": "kafka-cluster",
+  "version": 1,
+  "weekStart": ""
+}

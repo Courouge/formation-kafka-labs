@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "namespace": "fr.formation.kafka.ecommerce",
+  "name": "StockReleased",
+  "doc": "Compensation : restitution du stock après une réservation suivie d'une annulation en aval.",
+  "fields": [
+    {"name": "event_id", "type": "string"},
+    {"name": "order_id", "type": "string"},
+    {"name": "occurred_at", "type": {"type": "long", "logicalType": "timestamp-millis"}},
+    {"name": "version", "type": "int"},
+    {"name": "reservation_id", "type": "string"}
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "type": "record",
+  "namespace": "fr.formation.kafka.ecommerce",
+  "name": "PaymentCompleted",
+  "doc": "Émis par PaymentService quand le paiement est validé.",
+  "fields": [
+    {"name": "event_id", "type": "string"},
+    {"name": "order_id", "type": "string"},
+    {"name": "occurred_at", "type": {"type": "long", "logicalType": "timestamp-millis"}},
+    {"name": "version", "type": "int"},
+    {"name": "transaction_id", "type": "string"},
+    {"name": "amount", "type": "double"}
+  ]
+}

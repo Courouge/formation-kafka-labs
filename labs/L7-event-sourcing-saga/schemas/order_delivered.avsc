@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "namespace": "fr.formation.kafka.ecommerce",
+  "name": "OrderDelivered",
+  "doc": "Émis par ShippingService quand le colis est confirmé livré (état terminal heureux).",
+  "fields": [
+    {"name": "event_id", "type": "string"},
+    {"name": "order_id", "type": "string"},
+    {"name": "occurred_at", "type": {"type": "long", "logicalType": "timestamp-millis"}},
+    {"name": "version", "type": "int"},
+    {"name": "delivered_at", "type": {"type": "long", "logicalType": "timestamp-millis"}}
+  ]
+}

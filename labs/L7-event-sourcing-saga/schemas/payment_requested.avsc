@@ -1,0 +1,14 @@
+{
+  "type": "record",
+  "namespace": "fr.formation.kafka.ecommerce",
+  "name": "PaymentRequested",
+  "doc": "Command émise vers PaymentService (utilisé en mode orchestration).",
+  "fields": [
+    {"name": "event_id", "type": "string"},
+    {"name": "order_id", "type": "string"},
+    {"name": "occurred_at", "type": {"type": "long", "logicalType": "timestamp-millis"}},
+    {"name": "version", "type": "int"},
+    {"name": "amount", "type": "double"},
+    {"name": "currency", "type": "string", "default": "EUR"}
+  ]
+}

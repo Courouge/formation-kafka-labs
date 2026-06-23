@@ -1,0 +1,14 @@
+{
+  "type": "record",
+  "namespace": "fr.formation.kafka.ecommerce",
+  "name": "OrderShipped",
+  "doc": "Émis par ShippingService quand la commande est expédiée.",
+  "fields": [
+    {"name": "event_id", "type": "string"},
+    {"name": "order_id", "type": "string"},
+    {"name": "occurred_at", "type": {"type": "long", "logicalType": "timestamp-millis"}},
+    {"name": "version", "type": "int"},
+    {"name": "tracking_number", "type": "string"},
+    {"name": "carrier", "type": "string", "default": "UPS"}
+  ]
+}

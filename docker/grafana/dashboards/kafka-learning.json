@@ -1,0 +1,217 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "liveNow": false,
+  "panels": [
+    {
+      "type": "text",
+      "title": "Comment lire ce dashboard",
+      "id": 1,
+      "gridPos": { "h": 5, "w": 24, "x": 0, "y": 0 },
+      "options": {
+        "mode": "markdown",
+        "content": "Dashboard pédagogique pour les labs Kafka. Regardez les panels de gauche à droite : disponibilité du cluster, volume produit, réplication, puis santé Connect. Pendant un lab, gardez Grafana ouvert et observez ce qui change quand vous produisez des messages, lancez un consumer, créez un connecteur ou stoppez un broker."
+      }
+    },
+    {
+      "type": "stat",
+      "title": "1. Brokers Kafka disponibles",
+      "id": 2,
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 5 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "count(up{job=\"kafka-brokers\"} == 1)",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 2 },
+              { "color": "green", "value": 3 }
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "auto"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "2. Under-replicated partitions",
+      "id": 3,
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 5 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum(kafka_server_replicamanager_underreplicatedpartitions)",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "auto"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "3. Messages entrants / sec",
+      "id": 4,
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 5 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum(rate(kafka_server_brokertopicmetrics_messagesinpersec_total[1m]))",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "colorMode": "value",
+        "graphMode": "area",
+        "textMode": "auto"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "4. Kafka Connect disponible",
+      "id": 5,
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 5 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "up{job=\"kafka-connect\"}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "auto"
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Messages produits par broker",
+      "id": 6,
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 10 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum by (instance) (rate(kafka_server_brokertopicmetrics_messagesinpersec_total[1m]))",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Bytes entrants par broker",
+      "id": 7,
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 10 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum by (instance) (rate(kafka_server_brokertopicmetrics_bytesinpersec_total[1m]))",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "ISR shrink / expand pendant les incidents",
+      "id": 8,
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 18 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum by (instance) (rate(kafka_server_replicamanager_isrshrinkspersec_total[5m]))",
+          "legendFormat": "shrinks {{instance}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (instance) (rate(kafka_server_replicamanager_isrexpandspersec_total[5m]))",
+          "legendFormat": "expands {{instance}}",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Kafka Connect records / sec",
+      "id": 9,
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 18 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum by (connector) (rate(kafka_connect_source_task_metrics_source_record_write_total[1m]))",
+          "legendFormat": "source {{connector}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (connector) (rate(kafka_connect_sink_task_metrics_sink_record_read_total[1m]))",
+          "legendFormat": "sink {{connector}}",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Ce qu'il faut observer par lab",
+      "id": 10,
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 26 },
+      "options": {
+        "mode": "markdown",
+        "content": "- L1 : les 3 brokers sont UP, under-replicated partitions = 0.\\n- L2 / L5 : messages entrants augmente pendant les producers.\\n- L4 / M7 : Kafka Connect records/sec bouge quand Debezium publie.\\n- L8 : stopper un broker doit faire baisser Brokers up et peut provoquer ISR shrink / URP temporaire.\\n\\nComplétez les screenshots demandés dans `modules/B1-M06/OBSERVABILITE_LABS.md`."
+      }
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": ["kafka", "formation", "pedagogie"],
+  "templating": { "list": [] },
+  "time": { "from": "now-30m", "to": "now" },
+  "timezone": "",
+  "title": "Kafka Learning Dashboard",
+  "uid": "kafka-learning",
+  "version": 1,
+  "weekStart": ""
+}

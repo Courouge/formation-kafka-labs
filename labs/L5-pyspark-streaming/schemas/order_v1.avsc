@@ -1,0 +1,20 @@
+{
+  "type": "record",
+  "namespace": "ecommerce.public.orders",
+  "name": "Value",
+  "doc": "Schema Debezium plat post-SMT unwrap pour la table public.orders. Aligne sur le schema effectivement enregistre dans Schema Registry par le connecteur L4.",
+  "fields": [
+    {"name": "order_id", "type": {"type": "int", "connect.default": 0}, "default": 0},
+    {"name": "customer_id", "type": "int"},
+    {"name": "status", "type": "string"},
+    {"name": "total_amount", "type": "double"},
+    {"name": "currency", "type": {"type": "string", "connect.default": "EUR"}, "default": "EUR"},
+    {"name": "created_at", "type": {"type": "string", "connect.version": 1, "connect.default": "1970-01-01T00:00:00.000000Z", "connect.name": "io.debezium.time.ZonedTimestamp"}, "default": "1970-01-01T00:00:00.000000Z"},
+    {"name": "updated_at", "type": {"type": "string", "connect.version": 1, "connect.default": "1970-01-01T00:00:00.000000Z", "connect.name": "io.debezium.time.ZonedTimestamp"}, "default": "1970-01-01T00:00:00.000000Z"},
+    {"name": "__deleted", "type": ["null", "string"], "default": null},
+    {"name": "__op", "type": ["null", "string"], "default": null},
+    {"name": "__table", "type": ["null", "string"], "default": null},
+    {"name": "__source_ts_ms", "type": ["null", "long"], "default": null},
+    {"name": "__source_lsn", "type": ["null", "long"], "default": null}
+  ]
+}

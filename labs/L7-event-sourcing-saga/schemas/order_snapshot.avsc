@@ -1,0 +1,23 @@
+{
+  "type": "record",
+  "namespace": "fr.formation.kafka.ecommerce",
+  "name": "OrderSnapshot",
+  "doc": "État courant complet d'un Order. Publié dans le topic compacté orders.snapshots (clé=order_id).",
+  "fields": [
+    {"name": "order_id", "type": "string"},
+    {"name": "version", "type": "int", "doc": "Numéro d'event appliqué à ce snapshot."},
+    {"name": "status", "type": {
+      "type": "enum",
+      "name": "OrderStatus",
+      "symbols": ["CREATED", "PAID", "RESERVED", "SHIPPED", "DELIVERED", "CANCELLED"]
+    }},
+    {"name": "customer_id", "type": "string"},
+    {"name": "total", "type": "double"},
+    {"name": "currency", "type": "string", "default": "EUR"},
+    {"name": "snapshot_at", "type": {"type": "long", "logicalType": "timestamp-millis"}},
+    {"name": "transaction_id", "type": ["null", "string"], "default": null},
+    {"name": "reservation_id", "type": ["null", "string"], "default": null},
+    {"name": "tracking_number", "type": ["null", "string"], "default": null},
+    {"name": "cancel_reason", "type": ["null", "string"], "default": null}
+  ]
+}

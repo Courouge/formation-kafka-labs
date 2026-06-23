@@ -1,0 +1,27 @@
+{
+  "type": "record",
+  "namespace": "fr.formation.kafka.ecommerce",
+  "name": "OrderCreated",
+  "doc": "Émis par OrderService quand une commande PlaceOrder valide est reçue.",
+  "fields": [
+    {"name": "event_id", "type": "string", "doc": "UUID unique de l'événement (clé idempotence)."},
+    {"name": "order_id", "type": "string", "doc": "Identifiant de la commande (clé de partition)."},
+    {"name": "occurred_at", "type": {"type": "long", "logicalType": "timestamp-millis"}, "doc": "Quand l'événement s'est produit."},
+    {"name": "version", "type": "int", "doc": "Version de l'agrégat Order après application."},
+    {"name": "customer_id", "type": "string"},
+    {"name": "items", "type": {
+      "type": "array",
+      "items": {
+        "type": "record",
+        "name": "OrderItem",
+        "fields": [
+          {"name": "sku", "type": "string"},
+          {"name": "quantity", "type": "int"},
+          {"name": "unit_price", "type": "double"}
+        ]
+      }
+    }},
+    {"name": "total", "type": "double", "doc": "Montant total TTC."},
+    {"name": "currency", "type": "string", "default": "EUR"}
+  ]
+}

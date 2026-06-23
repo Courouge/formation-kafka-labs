@@ -1,0 +1,174 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "liveNow": false,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Messages / sec (1m rate)",
+      "id": 1,
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "mps", "decimals": 1 } },
+      "targets": [
+        {
+          "expr": "sum(rate(kafka_server_brokertopicmetrics_messagesinpersec_total{topic=\"$topic\"}[1m]))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Bytes in / sec",
+      "id": 2,
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "Bps", "decimals": 1 } },
+      "targets": [
+        {
+          "expr": "sum(rate(kafka_server_brokertopicmetrics_bytesinpersec_total{topic=\"$topic\"}[1m]))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Bytes out / sec",
+      "id": 3,
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "Bps", "decimals": 1 } },
+      "targets": [
+        {
+          "expr": "sum(rate(kafka_server_brokertopicmetrics_bytesoutpersec_total{topic=\"$topic\"}[1m]))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Log size (somme partitions)",
+      "id": 4,
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "bytes", "decimals": 1 } },
+      "targets": [
+        {
+          "expr": "sum(kafka_log_size{topic=\"$topic\"})",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Throughput — Bytes In/Out par broker",
+      "id": 10,
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 5 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "Bps" } },
+      "targets": [
+        {
+          "expr": "rate(kafka_server_brokertopicmetrics_bytesinpersec_total{topic=\"$topic\"}[1m])",
+          "legendFormat": "in broker {{broker_id}}",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(kafka_server_brokertopicmetrics_bytesoutpersec_total{topic=\"$topic\"}[1m])",
+          "legendFormat": "out broker {{broker_id}}",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Messages / sec par broker",
+      "id": 11,
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 5 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "mps" } },
+      "targets": [
+        {
+          "expr": "rate(kafka_server_brokertopicmetrics_messagesinpersec_total{topic=\"$topic\"}[1m])",
+          "legendFormat": "broker {{broker_id}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Requêtes Produce / Fetch / sec",
+      "id": 12,
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "rps" } },
+      "targets": [
+        {
+          "expr": "sum(rate(kafka_server_brokertopicmetrics_totalproducerequestspersec_total{topic=\"$topic\"}[1m]))",
+          "legendFormat": "produce",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(rate(kafka_server_brokertopicmetrics_totalfetchrequestspersec_total{topic=\"$topic\"}[1m]))",
+          "legendFormat": "fetch",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Log size par partition",
+      "id": 13,
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "bytes" } },
+      "targets": [
+        {
+          "expr": "kafka_log_size{topic=\"$topic\"}",
+          "legendFormat": "p{{partition}} (b{{broker_id}})",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "End-offset par partition (croissance)",
+      "id": 14,
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 23 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "max by (partition) (kafka_log_logendoffset{topic=\"$topic\"})",
+          "legendFormat": "p{{partition}}",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": ["kafka", "topic", "formation"],
+  "templating": {
+    "list": [
+      {
+        "name": "topic",
+        "label": "Topic",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "query": { "query": "label_values(kafka_log_logendoffset, topic)", "refId": "StandardVariableQuery" },
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": false,
+        "multi": false,
+        "current": { "selected": false, "text": "ecommerce.public.orders", "value": "ecommerce.public.orders" }
+      }
+    ]
+  },
+  "time": { "from": "now-30m", "to": "now" },
+  "timezone": "",
+  "title": "Kafka — Focus topic",
+  "uid": "kafka-topic",
+  "version": 1,
+  "weekStart": ""
+}

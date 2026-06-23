@@ -1,0 +1,87 @@
+---
+# JMX Prometheus Exporter — Kafka Connect (workers + connectors + tasks).
+# Exposé sur 0.0.0.0:7074/metrics.
+
+lowercaseOutputName: true
+lowercaseOutputLabelNames: true
+
+rules:
+  # ===== Connector status =====
+  - pattern: 'kafka.connect<type=connector-metrics, connector=(.+)><>connector-class:\s*(.+)'
+    name: kafka_connect_connector_info
+    labels:
+      connector: "$1"
+      connector_class: "$2"
+    value: 1
+    type: UNTYPED
+
+  - pattern: 'kafka.connect<type=connector-metrics, connector=(.+)><>status:\s*(running|paused|failed|destroyed|unassigned)'
+    name: kafka_connect_connector_status
+    labels:
+      connector: "$1"
+      status: "$2"
+    value: 1
+    type: UNTYPED
+
+  # ===== Worker-level metrics (count, etc) =====
+  - pattern: kafka.connect<type=connect-worker-metrics><>([a-z-]+):\s*([0-9.E+-]+)
+    name: kafka_connect_worker_$1
+    type: GAUGE
+
+  - pattern: kafka.connect<type=connect-worker-metrics, connector=(.+)><>([a-z-]+):\s*([0-9.E+-]+)
+    name: kafka_connect_worker_$2
+    labels:
+      connector: "$1"
+    type: GAUGE
+
+  - pattern: kafka.connect<type=connect-worker-rebalance-metrics><>([a-z-]+):\s*([0-9.E+-]+)
+    name: kafka_connect_worker_rebalance_$1
+    type: GAUGE
+
+  # ===== Source task metrics =====
+  - pattern: kafka.connect<type=source-task-metrics, connector=(.+), task=(\d+)><>([a-z-]+):\s*([0-9.E+-]+)
+    name: kafka_connect_source_task_$3
+    labels:
+      connector: "$1"
+      task: "$2"
+    type: GAUGE
+
+  # ===== Sink task metrics =====
+  - pattern: kafka.connect<type=sink-task-metrics, connector=(.+), task=(\d+)><>([a-z-]+):\s*([0-9.E+-]+)
+    name: kafka_connect_sink_task_$3
+    labels:
+      connector: "$1"
+      task: "$2"
+    type: GAUGE
+
+  # ===== Connector-task generic metrics (running-ratio, batch-size, etc) =====
+  - pattern: kafka.connect<type=connector-task-metrics, connector=(.+), task=(\d+)><>([a-z-]+):\s*([0-9.E+-]+)
+    name: kafka_connect_task_$3
+    labels:
+      connector: "$1"
+      task: "$2"
+    type: GAUGE
+
+  # ===== Task error metrics =====
+  - pattern: kafka.connect<type=task-error-metrics, connector=(.+), task=(\d+)><>([a-z-]+):\s*([0-9.E+-]+)
+    name: kafka_connect_task_error_$3
+    labels:
+      connector: "$1"
+      task: "$2"
+    type: GAUGE
+
+  # ===== JVM =====
+  - pattern: java.lang<type=Memory><HeapMemoryUsage>used
+    name: jvm_memory_heap_used_bytes
+    type: GAUGE
+  - pattern: java.lang<type=Memory><NonHeapMemoryUsage>used
+    name: jvm_memory_nonheap_used_bytes
+    type: GAUGE
+  - pattern: java.lang<name=(.+), type=GarbageCollector><>CollectionCount
+    name: jvm_gc_collection_count
+    labels:
+      gc: "$1"
+    type: COUNTER
+  - pattern: java.lang<type=Threads><>ThreadCount
+    name: jvm_threads_current
+    type: GAUGE

@@ -1,0 +1,42 @@
+{
+  "type": "record",
+  "namespace": "fr.formation.kafka.orders",
+  "name": "Order",
+  "doc": "Commande passée par un client. Schéma v2 - ajout de discount_code.",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string",
+      "doc": "Identifiant unique de la commande (UUID v4)."
+    },
+    {
+      "name": "customer_id",
+      "type": "string",
+      "doc": "Identifiant du client (clé de partitionnement côté producer)."
+    },
+    {
+      "name": "total",
+      "type": "double",
+      "doc": "Montant total TTC de la commande."
+    },
+    {
+      "name": "currency",
+      "type": "string",
+      "doc": "Code ISO-4217 (EUR, USD, GBP, ...)."
+    },
+    {
+      "name": "created_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Timestamp epoch millis de création côté producer."
+    },
+    {
+      "name": "discount_code",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Code promo optionnel ajouté en v2. Default null = compatibilité BACKWARD respectée."
+    }
+  ]
+}

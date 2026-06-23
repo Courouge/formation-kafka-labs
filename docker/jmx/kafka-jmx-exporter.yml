@@ -1,0 +1,87 @@
+---
+# Configuration JMX Prometheus Exporter pour Kafka 3.x (KRaft).
+# Exposée sur 0.0.0.0:7071/metrics (voir KAFKA_OPTS=-javaagent:...).
+# Inspirée des templates officiels prometheus/jmx_exporter.
+
+lowercaseOutputName: true
+lowercaseOutputLabelNames: true
+
+rules:
+  # ===== BrokerTopicMetrics par topic (label `topic`) =====
+  # MessagesInPerSec.Count → counter avec topic label
+  - pattern: kafka.server<type=(.+), name=(.+), topic=(.+)><>Count
+    name: kafka_server_$1_$2_total
+    labels:
+      topic: "$3"
+    type: COUNTER
+
+  - pattern: kafka.server<type=(.+), name=(.+), topic=(.+)><>(OneMinuteRate|FiveMinuteRate|FifteenMinuteRate|MeanRate)
+    name: kafka_server_$1_$2
+    labels:
+      topic: "$3"
+      window: "$4"
+    type: GAUGE
+
+  # ===== BrokerTopicMetrics agrégé (sans topic) =====
+  - pattern: kafka.server<type=(.+), name=(.+)><>Count
+    name: kafka_server_$1_$2_total
+    type: COUNTER
+
+  - pattern: kafka.server<type=(.+), name=(.+)><>(Value|OneMinuteRate|FiveMinuteRate|FifteenMinuteRate|MeanRate|Mean)
+    name: kafka_server_$1_$2
+    type: GAUGE
+
+  # ===== Replica manager =====
+  - pattern: kafka.server<type=ReplicaManager, name=(.+)><>Value
+    name: kafka_server_replicamanager_$1
+    type: GAUGE
+
+  - pattern: kafka.server<type=ReplicaManager, name=(.+)><>Count
+    name: kafka_server_replicamanager_$1_total
+    type: COUNTER
+
+  # ===== Controller (KRaft) =====
+  - pattern: kafka.controller<type=(.+), name=(.+)><>Value
+    name: kafka_controller_$1_$2
+    type: GAUGE
+
+  - pattern: kafka.controller<type=(.+), name=(.+)><>Count
+    name: kafka_controller_$1_$2_total
+    type: COUNTER
+
+  # ===== Network request metrics =====
+  - pattern: kafka.network<type=RequestMetrics, name=(.+), request=(.+)><>(Count|OneMinuteRate|Mean|99thPercentile)
+    name: kafka_network_requestmetrics_$1
+    labels:
+      request: "$2"
+      quantile: "$3"
+    type: GAUGE
+
+  # ===== Log par partition (Size, NumLogSegments, offsets) — label `topic` + `partition` =====
+  - pattern: kafka.log<type=Log, name=(Size|NumLogSegments|LogStartOffset|LogEndOffset), topic=(.+), partition=(.+)><>Value
+    name: kafka_log_$1
+    labels:
+      topic: "$2"
+      partition: "$3"
+    type: GAUGE
+
+  # ===== JVM =====
+  - pattern: java.lang<type=Memory><HeapMemoryUsage>used
+    name: jvm_memory_heap_used_bytes
+    type: GAUGE
+
+  - pattern: java.lang<type=Memory><NonHeapMemoryUsage>used
+    name: jvm_memory_nonheap_used_bytes
+    type: GAUGE
+
+  - pattern: java.lang<type=GarbageCollector, name=(.+)><>CollectionCount
+    name: jvm_gc_collection_count
+    labels:
+      gc: "$1"
+    type: COUNTER
+
+  - pattern: java.lang<type=GarbageCollector, name=(.+)><>CollectionTime
+    name: jvm_gc_collection_time_ms
+    labels:
+      gc: "$1"
+    type: COUNTER

@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "namespace": "fr.formation.kafka.ecommerce",
+  "name": "StockReserved",
+  "doc": "Émis par StockService quand le stock est réservé pour la commande.",
+  "fields": [
+    {"name": "event_id", "type": "string"},
+    {"name": "order_id", "type": "string"},
+    {"name": "occurred_at", "type": {"type": "long", "logicalType": "timestamp-millis"}},
+    {"name": "version", "type": "int"},
+    {"name": "reservation_id", "type": "string"}
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Under-Replicated Partitions (par broker)",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "id": 1,
+      "targets": [
+        {
+          "expr": "kafka_server_replicamanager_underreplicatedpartitions",
+          "legendFormat": "broker {{broker_id}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {"defaults": {"unit": "short", "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red", "value": 1}]}}, "overrides": []}
+    },
+    {
+      "type": "timeseries",
+      "title": "Active Controller Count (cluster)",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "id": 2,
+      "targets": [
+        {
+          "expr": "sum(kafka_controller_kafkacontroller_activecontrollercount)",
+          "legendFormat": "active controllers",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {"defaults": {"unit": "short", "min": 0, "max": 3}, "overrides": []}
+    },
+    {
+      "type": "timeseries",
+      "title": "Request Handler Avg Idle %",
+      "description": "% de temps idle des threads I/O. < 30% = saturation, augmenter num.io.threads.",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "id": 3,
+      "targets": [
+        {
+          "expr": "kafka_server_kafkarequesthandlerpool_requesthandleravgidlepercent * 100",
+          "legendFormat": "broker {{broker_id}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {"defaults": {"unit": "percent", "min": 0, "max": 100, "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "yellow", "value": 30}, {"color": "green", "value": 60}]}}, "overrides": []}
+    },
+    {
+      "type": "timeseries",
+      "title": "Bytes In/Out per second (cluster)",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "id": 4,
+      "targets": [
+        {
+          "expr": "sum(rate(kafka_server_brokertopicmetrics_bytesinpersec_total[1m]))",
+          "legendFormat": "bytes in/s",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(rate(kafka_server_brokertopicmetrics_bytesoutpersec_total[1m]))",
+          "legendFormat": "bytes out/s",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {"defaults": {"unit": "Bps"}, "overrides": []}
+    },
+    {
+      "type": "timeseries",
+      "title": "Request latency p99 (Produce / Fetch)",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+      "id": 5,
+      "targets": [
+        {
+          "expr": "kafka_network_requestmetrics_totaltimems{request=\"Produce\",quantile=\"99thPercentile\"}",
+          "legendFormat": "produce p99 broker {{broker_id}}",
+          "refId": "A"
+        },
+        {
+          "expr": "kafka_network_requestmetrics_totaltimems{request=\"Fetch\",quantile=\"99thPercentile\"}",
+          "legendFormat": "fetch p99 broker {{broker_id}}",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {"defaults": {"unit": "ms"}, "overrides": []}
+    },
+    {
+      "type": "timeseries",
+      "title": "JVM Heap usage / GC pauses",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+      "id": 6,
+      "targets": [
+        {
+          "expr": "jvm_memory_heap_used_bytes",
+          "legendFormat": "heap used broker {{broker_id}}",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(jvm_gc_collection_time_ms[1m])",
+          "legendFormat": "gc time/s broker {{broker_id}} ({{gc}})",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {"defaults": {"unit": "bytes"}, "overrides": []}
+    },
+    {
+      "type": "timeseries",
+      "title": "ISR shrinks / expands per second",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 24},
+      "id": 7,
+      "targets": [
+        {
+          "expr": "sum(rate(kafka_server_replicamanager_isrshrinkspersec[1m]))",
+          "legendFormat": "shrinks/s",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(rate(kafka_server_replicamanager_isrexpandspersec[1m]))",
+          "legendFormat": "expands/s",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {"defaults": {"unit": "ops"}, "overrides": []}
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["kafka", "ops", "lab-l8"],
+  "templating": {"list": []},
+  "time": {"from": "now-15m", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Kafka Deep — Ops",
+  "uid": "kafka-deep-l8",
+  "version": 1,
+  "weekStart": ""
+}

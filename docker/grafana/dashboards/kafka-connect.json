@@ -1,0 +1,246 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "liveNow": false,
+  "panels": [
+    {
+      "type": "row",
+      "title": "Vue cluster",
+      "id": 100,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "stat",
+      "title": "Connect worker up",
+      "id": 1,
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": { "colorMode": "value", "graphMode": "none", "textMode": "auto" },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "options": { "0": { "text": "DOWN", "color": "red" } }, "type": "value" },
+            { "options": { "1": { "text": "UP", "color": "green" } }, "type": "value" }
+          ]
+        }
+      },
+      "targets": [ { "expr": "up{job=\"kafka-connect\"}", "refId": "A" } ]
+    },
+    {
+      "type": "stat",
+      "title": "Connectors",
+      "id": 2,
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "kafka_connect_worker_connector_count", "refId": "A" } ]
+    },
+    {
+      "type": "stat",
+      "title": "Tasks total",
+      "id": 3,
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "kafka_connect_worker_task_count", "refId": "A" } ]
+    },
+    {
+      "type": "stat",
+      "title": "Tasks failed (tous connectors)",
+      "id": 4,
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 1 } ] }
+        }
+      },
+      "targets": [ { "expr": "sum(kafka_connect_worker_connector_failed_task_count)", "refId": "A" } ]
+    },
+    {
+      "type": "stat",
+      "title": "Rebalances last 1h",
+      "id": 5,
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "increase(kafka_connect_worker_rebalance_completed_rebalances_total[1h])", "refId": "A" } ]
+    },
+    {
+      "type": "stat",
+      "title": "Temps depuis dernier rebalance",
+      "id": 6,
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "ms" } },
+      "targets": [ { "expr": "kafka_connect_worker_rebalance_time_since_last_rebalance_ms", "refId": "A" } ]
+    },
+    {
+      "type": "table",
+      "title": "Connectors — vue d'ensemble",
+      "id": 10,
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 5 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "kafka_connect_worker_connector_running_task_count", "legendFormat": "{{connector}}", "format": "table", "instant": true, "refId": "A" },
+        { "expr": "kafka_connect_worker_connector_failed_task_count",  "legendFormat": "{{connector}}", "format": "table", "instant": true, "refId": "B" },
+        { "expr": "kafka_connect_worker_connector_paused_task_count",  "legendFormat": "{{connector}}", "format": "table", "instant": true, "refId": "C" },
+        { "expr": "kafka_connect_worker_connector_total_task_count",   "legendFormat": "{{connector}}", "format": "table", "instant": true, "refId": "D" }
+      ],
+      "transformations": [
+        { "id": "joinByField", "options": { "byField": "connector", "mode": "outer" } },
+        { "id": "organize", "options": {
+            "excludeByName": { "Time 1": true, "Time 2": true, "Time 3": true, "Time 4": true, "__name__ 1": true, "__name__ 2": true, "__name__ 3": true, "__name__ 4": true, "instance 1": true, "instance 2": true, "instance 3": true, "instance 4": true, "job 1": true, "job 2": true, "job 3": true, "job 4": true, "service 1": true, "service 2": true, "service 3": true, "service 4": true },
+            "renameByName": { "connector": "Connector", "Value #A": "Running", "Value #B": "Failed", "Value #C": "Paused", "Value #D": "Total" },
+            "indexByName": { "connector": 0, "Value #A": 1, "Value #B": 2, "Value #C": 3, "Value #D": 4 }
+        } }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Failed" }, "properties": [ { "id": "thresholds", "value": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 1 } ] } }, { "id": "custom.cellOptions", "value": { "type": "color-background" } } ] }
+        ]
+      }
+    },
+    {
+      "type": "row",
+      "title": "Focus sur connecteur : $connector",
+      "id": 200,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 12 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "stat",
+      "title": "Running tasks",
+      "id": 20,
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 13 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "kafka_connect_worker_connector_running_task_count{connector=\"$connector\"}", "refId": "A" } ]
+    },
+    {
+      "type": "stat",
+      "title": "Failed tasks",
+      "id": 21,
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 13 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 1 } ] } } },
+      "targets": [ { "expr": "kafka_connect_worker_connector_failed_task_count{connector=\"$connector\"}", "refId": "A" } ]
+    },
+    {
+      "type": "stat",
+      "title": "Paused tasks",
+      "id": 22,
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 13 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "kafka_connect_worker_connector_paused_task_count{connector=\"$connector\"}", "refId": "A" } ]
+    },
+    {
+      "type": "stat",
+      "title": "Records errors total",
+      "id": 23,
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 13 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "orange", "value": 1 }, { "color": "red", "value": 100 } ] } } },
+      "targets": [ { "expr": "sum(kafka_connect_task_error_total_record_errors{connector=\"$connector\"})", "refId": "A" } ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Source records produced / sec",
+      "id": 30,
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 17 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "rps" } },
+      "targets": [
+        { "expr": "kafka_connect_source_task_source_record_write_rate{connector=\"$connector\"}", "legendFormat": "write task {{task}}", "refId": "A" },
+        { "expr": "kafka_connect_source_task_source_record_poll_rate{connector=\"$connector\"}", "legendFormat": "poll task {{task}}", "refId": "B" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Sink records consumed / sec",
+      "id": 31,
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 17 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "rps" } },
+      "targets": [
+        { "expr": "kafka_connect_sink_task_sink_record_read_rate{connector=\"$connector\"}", "legendFormat": "read task {{task}}", "refId": "A" },
+        { "expr": "kafka_connect_sink_task_sink_record_send_rate{connector=\"$connector\"}", "legendFormat": "send task {{task}}", "refId": "B" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Records cumulés (source write / sink read)",
+      "id": 32,
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 25 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "kafka_connect_source_task_source_record_write_total{connector=\"$connector\"}", "legendFormat": "src-write task {{task}}", "refId": "A" },
+        { "expr": "kafka_connect_sink_task_sink_record_read_total{connector=\"$connector\"}", "legendFormat": "sink-read task {{task}}", "refId": "B" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Erreurs / retries / DLQ (cumul)",
+      "id": 33,
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 25 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "kafka_connect_task_error_total_record_errors{connector=\"$connector\"}", "legendFormat": "errors task {{task}}", "refId": "A" },
+        { "expr": "kafka_connect_task_error_total_record_failures{connector=\"$connector\"}", "legendFormat": "failures task {{task}}", "refId": "B" },
+        { "expr": "kafka_connect_task_error_total_retries{connector=\"$connector\"}", "legendFormat": "retries task {{task}}", "refId": "C" },
+        { "expr": "kafka_connect_task_error_deadletterqueue_produce_requests{connector=\"$connector\"}", "legendFormat": "dlq prod task {{task}}", "refId": "D" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Active records (buffer in-flight)",
+      "id": 34,
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 33 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "kafka_connect_source_task_source_record_active_count{connector=\"$connector\"}", "legendFormat": "src-active task {{task}}", "refId": "A" },
+        { "expr": "kafka_connect_sink_task_sink_record_active_count{connector=\"$connector\"}", "legendFormat": "sink-active task {{task}}", "refId": "B" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Running/Pause ratio + Offset commit",
+      "id": 35,
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 33 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "max": 1 } },
+      "targets": [
+        { "expr": "kafka_connect_task_running_ratio{connector=\"$connector\"}", "legendFormat": "running task {{task}}", "refId": "A" },
+        { "expr": "kafka_connect_task_pause_ratio{connector=\"$connector\"}", "legendFormat": "paused task {{task}}", "refId": "B" },
+        { "expr": "kafka_connect_task_offset_commit_success_percentage{connector=\"$connector\"} / 100", "legendFormat": "commit-success task {{task}}", "refId": "C" }
+      ]
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": ["kafka", "connect", "formation"],
+  "templating": {
+    "list": [
+      {
+        "name": "connector",
+        "label": "Connector",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "query": { "query": "label_values(kafka_connect_worker_connector_running_task_count, connector)", "refId": "StandardVariableQuery" },
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": false,
+        "multi": false,
+        "current": { "selected": false, "text": "datagen-orders", "value": "datagen-orders" }
+      }
+    ]
+  },
+  "time": { "from": "now-30m", "to": "now" },
+  "timezone": "",
+  "title": "Kafka Connect",
+  "uid": "kafka-connect",
+  "version": 3,
+  "weekStart": ""
+}

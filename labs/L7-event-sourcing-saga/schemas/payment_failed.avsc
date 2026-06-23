@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "namespace": "fr.formation.kafka.ecommerce",
+  "name": "PaymentFailed",
+  "doc": "Émis par PaymentService en cas de refus (montant trop élevé, carte refusée).",
+  "fields": [
+    {"name": "event_id", "type": "string"},
+    {"name": "order_id", "type": "string"},
+    {"name": "occurred_at", "type": {"type": "long", "logicalType": "timestamp-millis"}},
+    {"name": "version", "type": "int"},
+    {"name": "reason", "type": "string"}
+  ]
+}

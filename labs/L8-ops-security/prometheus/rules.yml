@@ -1,0 +1,48 @@
+# Règles d'alerte Prometheus de base pour le cluster Kafka L1.
+# À monter dans Prometheus via prometheus.yml :
+#   rule_files:
+#     - /etc/prometheus/rules/*.yml
+# Puis recharger : curl -X POST http://localhost:9090/-/reload
+groups:
+  - name: kafka-critical
+    interval: 30s
+    rules:
+      - alert: KafkaUnderReplicatedPartitions
+        expr: sum(kafka_server_replicamanager_underreplicatedpartitions) > 0
+        for: 2m
+        labels:
+          severity: critical
+          team: data-platform
+        annotations:
+          summary: "Partitions sous-répliquées depuis 2 min"
+          description: "Au moins une partition n'a plus la totalité de ses replicas dans l'ISR. Vérifier les brokers, le réseau, la pression GC et le disque."
+
+      - alert: KafkaActiveControllerCountInvalid
+        expr: sum(kafka_controller_kafkacontroller_activecontrollercount) != 1
+        for: 1m
+        labels:
+          severity: critical
+          team: data-platform
+        annotations:
+          summary: "Nombre de controllers actifs anormal ({{ $value }})"
+          description: "En KRaft, exactement un controller doit être leader. 0 = pas d'élection, >1 = split-brain."
+
+      - alert: KafkaBrokerDown
+        expr: up{job="kafka-brokers"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: data-platform
+        annotations:
+          summary: "Broker {{ $labels.instance }} indisponible"
+          description: "Prometheus ne peut plus scraper {{ $labels.instance }}. Le broker est probablement down ou son JMX exporter est arrêté."
+
+      - alert: KafkaOfflinePartitions
+        expr: sum(kafka_controller_kafkacontroller_offlinepartitionscount) > 0
+        for: 30s
+        labels:
+          severity: critical
+          team: data-platform
+        annotations:
+          summary: "Partitions hors ligne (production impossible)"
+          description: "{{ $value }} partition(s) n'ont plus de leader. Production et consommation bloquées sur ces partitions."

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Configuration log4j2 minimale pour le driver Spark.
+     Le cluster a sa propre config — celle-ci s'applique surtout en mode local. -->
+<Configuration status="WARN" monitorInterval="30">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_ERR">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5p %c{1.} - %m%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Root level="WARN">
+      <AppenderRef ref="Console"/>
+    </Root>
+    <Logger name="lab"                              level="INFO" additivity="false">
+      <AppenderRef ref="Console"/>
+    </Logger>
+    <Logger name="org.apache.spark.sql.streaming"   level="INFO"/>
+    <Logger name="org.apache.spark.scheduler"       level="WARN"/>
+    <Logger name="org.apache.kafka"                 level="WARN"/>
+    <Logger name="io.delta"                         level="WARN"/>
+  </Loggers>
+</Configuration>
