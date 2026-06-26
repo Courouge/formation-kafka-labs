@@ -3,7 +3,7 @@
 **Durée** : 2h
 **Stack** : PySpark 3.5, Kafka, Delta Lake 3.1, MinIO
 
-## TL;DR
+## En bref
 
 Pipeline streaming PySpark : Kafka → désérialisation Avro → Delta sur MinIO. Comprendre triggers, checkpoints, watermark.
 

@@ -3,7 +3,7 @@
 **Durée** : 1h
 **Stack** : Docker Compose, Kafka KRaft, Schema Registry, Kafka UI
 
-## TL;DR
+## En bref
 
 Démarrer le cluster Kafka 3 brokers avec Schema Registry, vérifier la santé, créer un premier topic, produire et consommer des messages avec les CLI.
 

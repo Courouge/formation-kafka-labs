@@ -3,7 +3,7 @@
 **Durée** : 2h
 **Stack** : Python 3.10+, confluent-kafka, fastavro, Schema Registry
 
-## TL;DR
+## En bref
 
 Producer + consumer Python avec sérialisation Avro et Schema Registry, démo rebalance, idempotence, évolution de schéma.
 

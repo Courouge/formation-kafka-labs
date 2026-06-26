@@ -3,7 +3,7 @@
 **Durée** : 2h
 **Stack** : Python 3.10, confluent-kafka, fastavro, Pydantic
 
-## TL;DR
+## En bref
 
 Implémenter une saga choreography (commande → paiement → stock → expédition) avec compensation. Reconstruire l'état d'un order par replay.
 

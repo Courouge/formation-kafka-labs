@@ -3,7 +3,7 @@
 **Durée** : 2h
 **Stack** : Kafka Connect distributed, Debezium Postgres, Confluent S3 Sink, MinIO
 
-## TL;DR
+## En bref
 
 Capturer les changements Postgres en temps réel via Debezium, matérialiser en Parquet sur MinIO (bronze layer), gérer les erreurs avec DLQ.
 
